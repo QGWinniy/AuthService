@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "reg/contracts/users";
+
+import "google/protobuf/empty.proto";
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+    rpc GetUserByLogin(GetUserByLoginRequest) returns (GetUserByLoginResponse);
+    rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
+}
+
+message CreateUserRequest {
+    string login = 1;
+    string password_hash = 2;
+}
+
+message CreateUserResponse {
+    uint64 user_id = 1;
+}
+
+message GetUserByLoginRequest {
+    string login = 1;
+}
+
+message GetUserByLoginResponse {
+    uint64 user_id = 1;
+    string login = 2;
+    string password_hash = 3;
+}
+
+message DeleteUserRequest {
+    uint64 user_id = 1;
+}
+
+message User {
+    uint64 id = 1;
+    string login = 2;
+}
