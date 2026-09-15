@@ -7,12 +7,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	http_user "reg/auth-service/internal/http/users"
-	clientsessions "reg/auth-service/internal/infrastructure/sessions"
-	clientusers "reg/auth-service/internal/infrastructure/users"
+	http_user "AuthService/auth-service/internal/http/users"
+	clientsessions "AuthService/auth-service/internal/infrastructure/sessions"
+	clientusers "AuthService/auth-service/internal/infrastructure/users"
 
-	"reg/auth-service/internal/usecase/sessions"
-	"reg/auth-service/internal/usecase/users"
+	"AuthService/auth-service/internal/usecase/sessions"
+	"AuthService/auth-service/internal/usecase/users"
 )
 
 func main() {

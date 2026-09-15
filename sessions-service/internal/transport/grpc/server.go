@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 
-	sessionspb "reg/contracts/sessions"
-	"reg/sessions-service/internal/usecase"
+	sessionspb "AuthService/contracts/sessions"
+	"AuthService/sessions-service/internal/usecase"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"

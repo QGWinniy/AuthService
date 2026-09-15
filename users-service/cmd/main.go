@@ -4,12 +4,12 @@ import (
 	"log"
 	"net"
 
-	userspb "reg/contracts/users"
+	userspb "AuthService/contracts/users"
 
-	"reg/users-service/internal/infrastructure/postgres"
-	// "reg/users-service/internal/repository"
-	grpc_users "reg/users-service/internal/transport/grpc"
-	"reg/users-service/internal/usecase"
+	"AuthService/users-service/internal/infrastructure/postgres"
+	// "AuthService/users-service/internal/repository"
+	grpc_users "AuthService/users-service/internal/transport/grpc"
+	"AuthService/users-service/internal/usecase"
 
 	"google.golang.org/grpc"
 )

@@ -2,9 +2,9 @@ package grpc
 
 import (
 	"context"
-	userspb "reg/contracts/users"
-	"reg/users-service/internal/domain"
-	"reg/users-service/internal/usecase"
+	userspb "AuthService/contracts/users"
+	"AuthService/users-service/internal/domain"
+	"AuthService/users-service/internal/usecase"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )

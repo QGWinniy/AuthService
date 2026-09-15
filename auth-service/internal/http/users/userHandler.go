@@ -3,8 +3,8 @@ package http_user
 import (
 	"encoding/json"
 	"net/http"
-	"reg/auth-service/internal/usecase/users"
-	"reg/auth-service/internal/usecase/sessions"
+	"AuthService/auth-service/internal/usecase/users"
+	"AuthService/auth-service/internal/usecase/sessions"
 )
 
 type Config struct {

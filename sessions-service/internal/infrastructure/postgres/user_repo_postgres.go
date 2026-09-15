@@ -3,8 +3,8 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"reg/sessions-service/internal/domain"
-	"reg/sessions-service/pkg/postgres"
+	"AuthService/sessions-service/internal/domain"
+	"AuthService/sessions-service/pkg/postgres"
 )
 
 type PostgresSessionRepository struct {

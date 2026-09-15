@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"reg/sessions-service/internal/repository"
+	"AuthService/sessions-service/internal/repository"
 )
 
 type DeleteSessionConfig struct {

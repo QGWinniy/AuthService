@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"reg/sessions-service/internal/domain"
+	"AuthService/sessions-service/internal/domain"
 )
 
 type SessionRepository interface {

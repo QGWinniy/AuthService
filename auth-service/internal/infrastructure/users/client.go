@@ -2,8 +2,8 @@ package clientusers
 
 import (
 	"context"
-	"reg/auth-service/internal/domain"
-	userspb "reg/contracts/users"
+	"AuthService/auth-service/internal/domain"
+	userspb "AuthService/contracts/users"
 
 	"google.golang.org/grpc"
 )

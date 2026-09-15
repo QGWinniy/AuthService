@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"reg/sessions-service/internal/config"
-	"reg/sessions-service/internal/domain"
-	"reg/sessions-service/internal/repository"
+	"AuthService/sessions-service/internal/config"
+	"AuthService/sessions-service/internal/domain"
+	"AuthService/sessions-service/internal/repository"
 	"time"
 )
 

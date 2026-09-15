@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"reg/users-service/internal/domain"
-	"reg/users-service/internal/repository"
+	"AuthService/users-service/internal/domain"
+	"AuthService/users-service/internal/repository"
 )
 
 type CreteConfig struct {

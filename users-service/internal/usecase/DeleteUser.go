@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"reg/users-service/internal/repository"
+	"AuthService/users-service/internal/repository"
 )
 
 type DeleteConfig struct {

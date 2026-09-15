@@ -2,7 +2,7 @@ package usecase_users
 
 import (
 	"context"
-	"reg/auth-service/internal/domain"
+	"AuthService/auth-service/internal/domain"
 )
 
 type UserGateway interface {

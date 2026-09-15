@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"reg/users-service/internal/domain"
-	"reg/users-service/pkg/postgres"
+	"AuthService/users-service/internal/domain"
+	"AuthService/users-service/pkg/postgres"
 )
 
 type PostgresUserRepository struct {

@@ -2,7 +2,7 @@ package usecase_sessions
 
 import (
 	"context"
-	"reg/auth-service/internal/domain"
+	"AuthService/auth-service/internal/domain"
 )
 
 type GetConfig struct {

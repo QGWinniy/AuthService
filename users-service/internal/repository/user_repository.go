@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"reg/users-service/internal/domain"
+	"AuthService/users-service/internal/domain"
 )
 
 type UsersRepository interface {

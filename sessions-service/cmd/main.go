@@ -4,11 +4,12 @@ import (
 	"log"
 	"net"
 
-	sessionspb "reg/contracts/sessions"
+	sessionspb "AuthService/contracts/sessions"
 
-	"reg/sessions-service/internal/infrastructure/postgres"
-	grpc_sessions "reg/sessions-service/internal/transport/grpc"
-	"reg/sessions-service/internal/usecase"
+	// "AuthService/sessions-service/internal/infrastructure/postgres"
+	"AuthService/sessions-service/internal/infrastructure/redis"
+	grpc_sessions "AuthService/sessions-service/internal/transport/grpc"
+	"AuthService/sessions-service/internal/usecase"
 
 	"google.golang.org/grpc"
 )
@@ -18,7 +19,9 @@ func main() {
 	// Repository
 	// =========================
 
-	sessionRepo, err := postgres.NewPostgresSessionRepository()
+	sessionRepo, err := redis.NewRedisSessionRepository()
+
+	// sessionRepo, err := postgres.NewPostgresSessionRepository()
 	if err != nil {
 		log.Fatal(err)
 	}

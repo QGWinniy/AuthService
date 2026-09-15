@@ -2,8 +2,8 @@ package clientsessions
 
 import (
 	"context"
-	"reg/auth-service/internal/domain"
-	sessionspb "reg/contracts/sessions"
+	"AuthService/auth-service/internal/domain"
+	sessionspb "AuthService/contracts/sessions"
 
 	"google.golang.org/grpc"
 )
