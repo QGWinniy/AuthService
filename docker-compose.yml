@@ -26,19 +26,43 @@ services:
   # =========================
   # Sessions PostgreSQL
   # =========================
+  #
+  # Пока не используется.
+  #
+  # sessions-db:
+  #   image: postgres:16-alpine
+  #   container_name: sessions-db
+  #
+  #   environment:
+  #     POSTGRES_USER: ${SESSIONS_DB_USER}
+  #     POSTGRES_PASSWORD: ${SESSIONS_DB_PASSWORD}
+  #     POSTGRES_DB: ${SESSIONS_DB_NAME}
+  #
+  #   volumes:
+  #     - sessions-db-data:/var/lib/postgresql/data
+  #     - ./migrations/sessions:/docker-entrypoint-initdb.d:ro
+  #
+  #   networks:
+  #     - backend
+  #
+  #   restart: unless-stopped
 
-  sessions-db:
-    image: postgres:16-alpine
-    container_name: sessions-db
 
-    environment:
-      POSTGRES_USER: ${SESSIONS_DB_USER}
-      POSTGRES_PASSWORD: ${SESSIONS_DB_PASSWORD}
-      POSTGRES_DB: ${SESSIONS_DB_NAME}
+  # =========================
+  # Redis
+  # =========================
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD}
 
     volumes:
-      - sessions-db-data:/var/lib/postgresql/data
-      - ./migrations/sessions:/docker-entrypoint-initdb.d:ro
+      - redis-data:/data
 
     networks:
       - backend
@@ -89,15 +113,14 @@ services:
     container_name: sessions-service
 
     environment:
-      DB_HOST: sessions-db
-      DB_PORT: 5432
-      DB_USER: ${SESSIONS_DB_USER}
-      DB_PASSWORD: ${SESSIONS_DB_PASSWORD}
-      DB_NAME: ${SESSIONS_DB_NAME}
-      DB_SSLMODE: disable
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: ${REDIS_DB}
+      JWT_SECRET: ${JWT_SECRET}
 
     depends_on:
-      - sessions-db
+      - redis
 
     ports:
       - "${SESSIONS_SERVICE_PORT}:50052"
@@ -151,4 +174,6 @@ networks:
 
 volumes:
   users-db-data:
-  sessions-db-data:
+  # sessions-db-data:
+  redis-data:
+

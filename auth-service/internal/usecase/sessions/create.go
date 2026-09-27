@@ -1,8 +1,9 @@
 package usecase_sessions
 
 import (
-	"context"
 	"AuthService/auth-service/internal/domain"
+	"context"
+	"log"
 )
 
 type CreateConfig struct {
@@ -30,6 +31,9 @@ func (u *CreateSessionUC) Create(
 		ctx,
 		userID,
 	)
+
+	log.Println("session  usecase: " + session.Jwt)
+
 	if err != nil {
 		return nil, err
 	}

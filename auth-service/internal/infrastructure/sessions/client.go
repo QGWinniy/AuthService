@@ -36,6 +36,7 @@ func (c *ClientSessionsService) CreateSession(
 	return &domain.Session{
 		SessionID: response.GetSession().GetSessionId(),
 		UserID:    response.GetSession().GetUserId(),
+		Jwt: response.GetSession().GetJwt(),
 		ExpiresAt: response.GetSession().GetExpiresAt().AsTime(),
 	}, nil
 }

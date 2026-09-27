@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log"
 
 	sessionspb "AuthService/contracts/sessions"
 	"AuthService/sessions-service/internal/usecase"
@@ -41,9 +42,12 @@ func (s *Server) CreateSession(
 		return nil, err
 	}
 
+	log.Println("transport grpc jwt: " + session.Jwt)
+
 	return &sessionspb.CreateSessionResponse{
 		Session: &sessionspb.Session{
 			SessionId: session.SessionId,
+			Jwt: session.Jwt,
 			UserId:    session.UserId,
 			ExpiresAt: timestamppb.New(session.ExpiresAt),
 		},

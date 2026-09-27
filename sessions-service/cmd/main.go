@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 
 	sessionspb "AuthService/contracts/sessions"
 
@@ -10,6 +11,7 @@ import (
 	"AuthService/sessions-service/internal/infrastructure/redis"
 	grpc_sessions "AuthService/sessions-service/internal/transport/grpc"
 	"AuthService/sessions-service/internal/usecase"
+	"AuthService/sessions-service/pkg/jwt"
 
 	"google.golang.org/grpc"
 )
@@ -27,6 +29,8 @@ func main() {
 	}
 	defer sessionRepo.Close()
 
+	jwtManager := jwt.NewManager([]byte(os.Getenv("JWT_SECRET")))
+
 	// =========================
 	// UseCases
 	// =========================
@@ -34,6 +38,7 @@ func main() {
 	createSessionUC := usecase.NewCreateSessionUC(
 		usecase.CreateSessionConfig{
 			SessionRepo: sessionRepo,
+			JWTManager: jwtManager,
 		},
 	)
 

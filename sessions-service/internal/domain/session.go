@@ -7,4 +7,5 @@ type Session struct {
 	UserId uint64
 	Data string
 	ExpiresAt time.Time
+	Jwt string
 }

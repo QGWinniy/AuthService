@@ -2,16 +2,18 @@ package usecase
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
+	"time"
+
 	"AuthService/sessions-service/internal/config"
 	"AuthService/sessions-service/internal/domain"
 	"AuthService/sessions-service/internal/repository"
-	"time"
+
+	"AuthService/sessions-service/pkg/jwt"
 )
 
 type CreateSessionConfig struct {
 	SessionRepo repository.SessionRepository
+	JWTManager  *jwt.Manager
 }
 
 type CreateSessionUC struct {
@@ -24,39 +26,31 @@ func NewCreateSessionUC(conf CreateSessionConfig) *CreateSessionUC {
 	}
 }
 
-func RandomSessionID(n int) (string, error) {
-    b := make([]byte, n)
-
-    if _, err := rand.Read(b); err != nil {
-        return "", err
-    }
-
-    return base64.RawURLEncoding.EncodeToString(b), nil
-}
-
 func (u *CreateSessionUC) CreateSession(
 	ctx context.Context,
-	userId uint64,
+	userID uint64,
 ) (*domain.Session, error) {
-	sessionId, err := RandomSessionID(config.SessionIdLength)
+	now := time.Now()
+	expiresAt := now.Add(config.SessionDuration)
+
+	token, jti, err := u.config.JWTManager.Create(
+		userID,
+		expiresAt,
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	session := &domain.Session{
-		SessionId: sessionId,
-		UserId: userId,
-		ExpiresAt: time.Now().Add(config.SessionDuration),
+		SessionId: jti,
+		UserId:    userID,
+		ExpiresAt: expiresAt,
+		Jwt:     token,
 	}
 
-	err = u.config.SessionRepo.Create(ctx, session)
-
-	if err != nil {
+	if err := u.config.SessionRepo.Create(ctx, session); err != nil {
 		return nil, err
 	}
 
-	return  session, nil
+	return session, nil
 }
-
-
-

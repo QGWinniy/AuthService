@@ -15,8 +15,9 @@ service SessionsService {
 
 message Session {
     string session_id = 1;
-    uint64 user_id = 2;
-    google.protobuf.Timestamp expires_at = 3;
+    string jwt = 2;
+    uint64 user_id = 3;
+    google.protobuf.Timestamp expires_at = 4;
 }
 
 message CreateSessionRequest {

@@ -1,10 +1,11 @@
 package http_user
 
 import (
-	"encoding/json"
-	"net/http"
-	"AuthService/auth-service/internal/usecase/users"
 	"AuthService/auth-service/internal/usecase/sessions"
+	"AuthService/auth-service/internal/usecase/users"
+	"encoding/json"
+	"log"
+	"net/http"
 )
 
 type Config struct {
@@ -77,8 +78,8 @@ func (h *UsersHandler) Login(
 		return
 	}
 
-	session, err := h.config.CreateSessionUC.Create(
-		r.Context(),
+	session,err := h.config.CreateSessionUC.Create(
+		r.Context(), 
 		user.Id,
 	)
 	if err != nil {
@@ -86,9 +87,11 @@ func (h *UsersHandler) Login(
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_id",
-		Value:    session.SessionID,
+	log.Println("http  userHandler: " + session.Jwt)
+
+	http.SetCookie(w, &http.Cookie{	
+		Name:     "session_jwt",
+		Value:    session.Jwt,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
