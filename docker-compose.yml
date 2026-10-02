@@ -22,6 +22,28 @@ services:
 
     restart: unless-stopped
 
+  # =========================
+  # User Servers PostgreSQL
+  # =========================
+
+  user-servers-db:
+    image: postgres:16-alpine
+    container_name: user-servers-db
+
+    environment:
+      POSTGRES_USER: ${USER_SERVERS_DB_USER}
+      POSTGRES_PASSWORD: ${USER_SERVERS_DB_PASSWORD}
+      POSTGRES_DB: ${USER_SERVERS_DB_NAME}
+
+    volumes:
+      - user-servers-db-data:/var/lib/postgresql/data
+      - ./migrations/user-servers:/docker-entrypoint-initdb.d:ro
+
+    networks:
+      - backend
+
+    restart: unless-stopped
+
 
   # =========================
   # Sessions PostgreSQL
@@ -251,6 +273,7 @@ services:
     container_name: server-service
 
     environment:
+      JWT_SECRET: ${JWT_SECRET}
       KAFKA_BROKERS: ${KAFKA_BROKERS}
       KAFKA_TOPIC: ${KAFKA_TOPIC}
       KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
@@ -260,6 +283,40 @@ services:
 
     ports:
       - "${SERVER_SERVICE_PORT}:8088"
+
+    networks:
+      - backend
+
+    restart: unless-stopped
+
+  # =========================
+  # Server Service Consumer
+  # =========================
+
+  server-service-consumer:
+    build:
+      context: .
+      dockerfile: server-service-consumer/Dockerfile
+
+    container_name: server-service-consumer
+
+    environment:
+      DB_HOST: user-servers-db
+      DB_PORT: 5432
+      DB_USER: ${USER_SERVERS_DB_USER}
+      DB_PASSWORD: ${USER_SERVERS_DB_PASSWORD}
+      DB_NAME: ${USER_SERVERS_DB_NAME}
+      DB_SSLMODE: disable
+
+      KAFKA_BROKERS: ${KAFKA_BROKERS}
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
+      KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
+
+    depends_on:
+      - kafka
+
+    ports:
+      - "${SERVER_SERVICE_CONSUMER_PORT}:8089"
 
     networks:
       - backend
@@ -282,6 +339,8 @@ networks:
 
 volumes:
   users-db-data:
+  user-servers-db-data:
   # sessions-db-data:
   redis-data:
   kafka-data:
+

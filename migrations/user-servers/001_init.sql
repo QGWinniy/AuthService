@@ -1,0 +1,8 @@
+CREATE TABLE user_servers (
+    id BIGINT PRIMARY KEY,
+    addr VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    userName VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    userId VARCHAR(255) NOT NULL
+);
