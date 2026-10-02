@@ -7,7 +7,7 @@ type AddServerRequest struct {
 	Addr     string `json:"addr"` 
 	UserName string `json:"userName"`
 	Password string `json:"password"`
-	UserId   int    `json:"userId"`
+	// UserId   int    `json:"userId"`
 }
 
 func AddServerRequestToUserServer(r *AddServerRequest) *domain.UserServer {
@@ -16,7 +16,7 @@ func AddServerRequestToUserServer(r *AddServerRequest) *domain.UserServer {
 		Name:     r.Name,
 		UserName: r.UserName,
 		Password: r.Password,
-		UserId:   r.UserId,
+		// UserId:   r.UserId,
 	}
 }
 

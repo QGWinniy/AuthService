@@ -1,9 +1,10 @@
 package http_server
 
 import (
-	"log"
+	"AuthService/server-service/internal/domain"
 	"AuthService/server-service/internal/usecase"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -33,17 +34,28 @@ func (h *ServerHandler) AddServer(
 ) {
 	var req AddServerRequest
 
+	ctx := r.Context()
+
+	userIDUint, ok := ctx.Value(domain.UserIDKeyContext).(uint64)
+ 
+	userID := int64(userIDUint) // опасная хуйня переделать в будущем
+
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid json", http.StatusBadRequest)
 		return
 	}
 
-	ctx := r.Context()
-
+	userServer := AddServerRequestToUserServer(&req)
+	userServer.UserId = userID
 
 	err := h.config.CreationRequestedUC.ServerCreationRequested(
 		ctx,
-		AddServerRequestToUserServer(&req),
+		userServer,
 	)
 
 	if err != nil {

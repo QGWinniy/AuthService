@@ -12,7 +12,9 @@ import (
 
 	httpserver "AuthService/server-service/internal/http/server"
 	serverproducer "AuthService/server-service/internal/infrastructure/kafka"
+	"AuthService/server-service/internal/middleware"
 	"AuthService/server-service/internal/usecase"
+	"AuthService/server-service/pkg/jwt"
 	kafkaclient "AuthService/server-service/pkg/kafka"
 )
 
@@ -31,12 +33,14 @@ func main() {
 		usecase.ServerCreationRequestedConfig{Broker: serverBroker},
 	)
 
+	managerJWT := jwt.NewManager([]byte(os.Getenv("JWT_SECRET")))
+
 	handler := httpserver.NewSeverHandler(httpserver.Config{
 		CreationRequestedUC: creationRequestedUC,
 	})
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /servers", handler.AddServer)
+	mux.HandleFunc("POST /servers", middleware.AuthJWTMiddleware(handler.AddServer, managerJWT))
 
 	server := &http.Server{
 		Addr:    ":8088",
@@ -46,7 +50,7 @@ func main() {
 	shutdownSignal := make(chan os.Signal, 1)
 	signal.Notify(shutdownSignal, os.Interrupt, syscall.SIGTERM)
 
-	log.Println("server-service_v4 started on :8088")
+	log.Println("server-service_v7 started on :8088")
 
 	go func() {
 		log.Printf("server-service is listening on %s", server.Addr)

@@ -37,7 +37,7 @@ func (b *ServerBroker) PublishServerCreationRequested(
 
 	return b.producer.Write(
 		ctx,
-		[]byte(strconv.Itoa(userServer.UserId)),
+		[]byte(strconv.Itoa(int(userServer.UserId))),
 		data,
 	)
 }

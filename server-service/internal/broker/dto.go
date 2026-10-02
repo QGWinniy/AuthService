@@ -16,7 +16,7 @@ type ServerCreationRequestedEvent struct {
 // ToServerCreationRequestedEvent конвертирует UserServer в ServerCreationRequestedEvent
 func ToServerCreationRequestedEvent(userServer *domain.UserServer) ServerCreationRequestedEvent {
 	return ServerCreationRequestedEvent{
-		UserID:   strconv.Itoa(userServer.UserId),
+		UserID:   strconv.Itoa(int(userServer.UserId)),
 		Addr:     userServer.Addr,
 		Name:     userServer.Name,
 		UserName: userServer.UserName,
