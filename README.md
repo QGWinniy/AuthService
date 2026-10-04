@@ -17,24 +17,28 @@ Client ── HTTP :8080───> │ POST /register, /login    │
                             │                     │
                        PostgreSQL                Redis
 
-                         ┌───────────────────────────┐
-                         │      server-service       │
-Client ── HTTP :8088 ───>│POST /servers, GET /servers│
-                         └─────────────┬─────────────┘
-                                       │ publish
-                                  ┌────▼────┐
-                                  │  Kafka  │
-                                  └────┬────┘
-                                       │ consume
-                         ┌─────────────▼─────────────┐
-                         │  server-service-consumer  │
-                         └─────────────┬─────────────┘
-                                       │
-                                  ┌────▼────┐
-                                  │ HAProxy │
-                                  └────┬────┘
-                                       │
-                    ┌──────────────────▼──────────────────┐
-                    │ Patroni × 2 · etcd · PostgreSQL 16  │
-                    └─────────────────────────────────────┘
+                         ┌─────────────────────────────┐
+                         │      server-service         │
+Client ── HTTP :8088 ───>│ POST /servers, GET /servers │
+                         └─────┬────────────────┬──────┘
+                       publish │                │ read :5433
+                               ▼                │
+                          ┌─────────┐           │
+                          │  Kafka  │           │
+                          └────┬────┘           │
+                               │ consume        │
+                 ┌─────────────▼────────────┐   │
+                 │ server-service-consumer  │   │
+                 └──────────┬───────────────┘   │
+                        write :5432             │
+                            └─────────┬─────────┘
+                                      ▼
+                                 ┌─────────┐
+                                 │ HAProxy │
+                                 └────┬────┘
+                                      │
+                   ┌──────────────────▼───────────────────┐
+                   │ Patroni-кластер PostgreSQL 16 + etcd │
+                   │ primary (write) · replica (read-only)│
+                   └──────────────────────────────────────┘
 ```
