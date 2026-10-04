@@ -386,6 +386,13 @@ services:
       KAFKA_TOPIC: ${KAFKA_TOPIC}
       KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
 
+      DB_HOST: haproxy
+      DB_PORT: 5433
+      DB_USER: ${USER_SERVERS_DB_USER_PATRONI1}
+      DB_PASSWORD: ${USER_SERVERS_DB_PASSWORD_PATRONI1}
+      DB_NAME: ${USER_SERVERS_DB_NAME_PATRONI1}
+      DB_SSLMODE: disable
+
     depends_on:
       - kafka
 

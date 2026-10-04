@@ -1,10 +1,13 @@
 package http_server
 
-import "AuthService/server-service/internal/domain"
+import (
+	"AuthService/server-service/internal/domain"
+	"strconv"
+)
 
 type AddServerRequest struct {
 	Name     string `json:"name"`
-	Addr     string `json:"addr"` 
+	Addr     string `json:"addr"`
 	UserName string `json:"userName"`
 	Password string `json:"password"`
 	// UserId   int    `json:"userId"`
@@ -38,4 +41,17 @@ type GetUserServersResponse struct {
 	Servers []ServerResponse `json:"servers"`
 }
 
+func UserServersToGetUserServersResponse(
+	userServers []domain.UserServer,
+) GetUserServersResponse {
+	servers := make([]ServerResponse, 0, len(userServers))
 
+	for _, userServer := range userServers {
+		servers = append(servers, ServerResponse{
+			ID:   strconv.Itoa(userServer.ID),
+			Name: userServer.Name,
+		})
+	}
+
+	return GetUserServersResponse{Servers: servers}
+}

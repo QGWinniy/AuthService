@@ -12,6 +12,7 @@ import (
 
 	httpserver "AuthService/server-service/internal/http/server"
 	serverproducer "AuthService/server-service/internal/infrastructure/kafka"
+	"AuthService/server-service/internal/infrastructure/postgres"
 	"AuthService/server-service/internal/middleware"
 	"AuthService/server-service/internal/usecase"
 	"AuthService/server-service/pkg/jwt"
@@ -33,14 +34,29 @@ func main() {
 		usecase.ServerCreationRequestedConfig{Broker: serverBroker},
 	)
 
+	userServersRepo, err := postgres.NewPostgresRepository()
+	if err != nil {
+		log.Fatalf("create postgres repository: %v", err)
+	}
+	defer func() {
+		if err := userServersRepo.Close(); err != nil {
+			log.Printf("close postgres repository: %v", err)
+		}
+	}()
+	getUserServersUC := usecase.NewGetUserServersUC(
+		usecase.GetUserServersConfig{Repository: userServersRepo},
+	)
+
 	managerJWT := jwt.NewManager([]byte(os.Getenv("JWT_SECRET")))
 
 	handler := httpserver.NewSeverHandler(httpserver.Config{
 		CreationRequestedUC: creationRequestedUC,
+		GetUserServersUC:    getUserServersUC,
 	})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /servers", middleware.AuthJWTMiddleware(handler.AddServer, managerJWT))
+	mux.HandleFunc("GET /servers", middleware.AuthJWTMiddleware(handler.GetUserServers, managerJWT))
 
 	server := &http.Server{
 		Addr:    ":8088",

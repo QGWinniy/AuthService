@@ -10,13 +10,13 @@ import (
 
 type Config struct {
 	CreationRequestedUC *usecase.ServerCreationRequestedUC
+	GetUserServersUC    *usecase.GetUserServersUC
 	// RegisterUC *usecase_users.RegisterUC
 	// LoginUC *usecase_users.LoginUC
 
 	// CreateSessionUC *usecase_sessions.CreateSessionUC
 	// GetSession *usecase_sessions.GetSessionUC
 }
-
 
 type ServerHandler struct {
 	config Config
@@ -37,7 +37,7 @@ func (h *ServerHandler) AddServer(
 	ctx := r.Context()
 
 	userIDUint, ok := ctx.Value(domain.UserIDKeyContext).(uint64)
- 
+
 	userID := int64(userIDUint) // опасная хуйня переделать в будущем
 
 	if !ok {
@@ -88,29 +88,32 @@ func (h *ServerHandler) DeleteServer(
 	})
 }
 
-// GetUserServers — заглушка получения всех серверов пользователя.
 func (h *ServerHandler) GetUserServers(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	// TODO: реализовать получение серверов пользователя
+	ctx := r.Context()
 
-	response := GetUserServersResponse{
-		Servers: []ServerResponse{
-			{
-				ID:   "stub-server-id-1",
-				Name: "Test Server",
-			},
-			{
-				ID:   "stub-server-id-2",
-				Name: "Another Server",
-			},
-		},
+	userIDUint, ok := ctx.Value(domain.UserIDKeyContext).(uint64)
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
 	}
+
+	userServers, err := h.config.GetUserServersUC.GetUserServers(
+		ctx,
+		int64(userIDUint),
+	)
+	if err != nil {
+		log.Printf("get user servers error: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	response := UserServersToGetUserServersResponse(userServers)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	_ = json.NewEncoder(w).Encode(response)
 }
-
