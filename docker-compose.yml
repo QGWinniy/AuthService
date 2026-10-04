@@ -1,5 +1,113 @@
 services:
 
+  ### ПИЗДА
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: postgres-etcd
+
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd1
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd:2379
+
+    volumes:
+      - etcd-data:/etcd-data
+
+    networks:
+      - postgres-ha
+
+    restart: unless-stopped
+
+
+  user-servers-patroni1:
+    build:
+      context: ./patroni
+
+    image: postgres-patroni:16
+
+    container_name: postgres-user-servers-patroni1
+    hostname: user-servers-patroni1
+
+    env_file:
+    - .env
+
+    environment:
+      PATRONI_SUPERUSER_USERNAME: ${USER_SERVERS_DB_USER_PATRONI1}
+      PATRONI_SUPERUSER_PASSWORD: ${USER_SERVERS_DB_PASSWORD_PATRONI1}
+      PATRONI_REPLICATION_USERNAME: ${USER_SERVERS_DB_USER_PATRONI2}
+      PATRONI_REPLICATION_PASSWORD: ${USER_SERVERS_DB_PASSWORD_PATRONI2}
+
+    volumes:
+      - pg1-data:/var/lib/postgresql/data
+      - ./patroni/user-servers-patroni1.yml:/etc/patroni/patroni.yml:ro
+      - ./migrations/user-servers:/docker-entrypoint-initdb.d:ro
+
+    networks:
+      - postgres-ha
+
+    depends_on:
+      - etcd
+
+    restart: unless-stopped
+
+
+  user-servers-patroni2:
+    build:
+      context: ./patroni
+
+    image: postgres-patroni:16
+
+    container_name: postgres-user-servers-patroni2
+    hostname: user-servers-patroni2
+
+    env_file:
+    - .env
+
+    environment:
+      PATRONI_SUPERUSER_USERNAME: ${USER_SERVERS_DB_USER_PATRONI1}
+      PATRONI_SUPERUSER_PASSWORD: ${USER_SERVERS_DB_PASSWORD_PATRONI1}
+      PATRONI_REPLICATION_USERNAME: ${USER_SERVERS_DB_USER_PATRONI2}
+      PATRONI_REPLICATION_PASSWORD: ${USER_SERVERS_DB_PASSWORD_PATRONI2}
+
+    volumes:
+      - pg2-data:/var/lib/postgresql/data
+      - ./patroni/user-servers-patroni2.yml:/etc/patroni/patroni.yml:ro
+      - ./migrations/user-servers:/docker-entrypoint-initdb.d:ro
+
+    networks:
+      - postgres-ha
+
+    depends_on:
+      - etcd
+
+    restart: unless-stopped
+
+
+  haproxy:
+    image: haproxy:3.2-alpine
+
+    container_name: postgres-haproxy
+
+    ports:
+      - "5432:5432"
+      - "5433:5433"
+
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
+    networks:
+      - postgres-ha
+      - backend
+
+    depends_on:
+      - user-servers-patroni1
+      - user-servers-patroni2
+
+    restart: unless-stopped
+
   # =========================
   # Users PostgreSQL
   # =========================
@@ -31,9 +139,9 @@ services:
     container_name: user-servers-db
 
     environment:
-      POSTGRES_USER: ${USER_SERVERS_DB_USER}
-      POSTGRES_PASSWORD: ${USER_SERVERS_DB_PASSWORD}
-      POSTGRES_DB: ${USER_SERVERS_DB_NAME}
+      POSTGRES_USER: ${USER_SERVERS_DB_USER_PATRONI1}
+      POSTGRES_PASSWORD: ${USER_SERVERS_DB_PASSWORD_PATRONI1}
+      POSTGRES_DB: ${USER_SERVERS_DB_NAME_PATRONI1}
 
     volumes:
       - user-servers-db-data:/var/lib/postgresql/data
@@ -301,11 +409,11 @@ services:
     container_name: server-service-consumer
 
     environment:
-      DB_HOST: user-servers-db
+      DB_HOST: haproxy
       DB_PORT: 5432
-      DB_USER: ${USER_SERVERS_DB_USER}
-      DB_PASSWORD: ${USER_SERVERS_DB_PASSWORD}
-      DB_NAME: ${USER_SERVERS_DB_NAME}
+      DB_USER: ${USER_SERVERS_DB_USER_PATRONI1}
+      DB_PASSWORD: ${USER_SERVERS_DB_PASSWORD_PATRONI1}
+      DB_NAME: ${USER_SERVERS_DB_NAME_PATRONI1}
       DB_SSLMODE: disable
 
       KAFKA_BROKERS: ${KAFKA_BROKERS}
@@ -314,6 +422,7 @@ services:
 
     depends_on:
       - kafka
+      - haproxy
 
     ports:
       - "${SERVER_SERVICE_CONSUMER_PORT}:8089"
@@ -331,6 +440,8 @@ services:
 networks:
   backend:
     driver: bridge
+  postgres-ha:
+    driver: bridge
 
 
 # =========================
@@ -344,3 +455,6 @@ volumes:
   redis-data:
   kafka-data:
 
+  etcd-data:
+  pg1-data:
+  pg2-data:

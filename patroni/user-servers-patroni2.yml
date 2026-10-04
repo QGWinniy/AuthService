@@ -1,0 +1,43 @@
+scope: postgres-user-servers-cluster
+name: user-servers-patroni2
+
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: user-servers-patroni2:8008
+
+etcd3:
+  hosts: etcd:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+
+      parameters:
+        wal_level: replica
+        hot_standby: "on"
+        max_wal_senders: 10
+        max_replication_slots: 10
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+  post_init: /usr/local/bin/init-user-servers-db.sh
+
+  pg_hba:
+    - host all all 0.0.0.0/0 scram-sha-256
+    - host replication replicator 0.0.0.0/0 scram-sha-256
+
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: user-servers-patroni2:5432
+  data_dir: /var/lib/postgresql/data/pgdata
+
+  parameters:
+    unix_socket_directories: /var/run/postgresql

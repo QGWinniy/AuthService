@@ -60,14 +60,14 @@ func (r *PostgresUserServersRepository) CheckUserHasServer(
 
 const CreateUserServer = `
 	INSERT INTO user_servers (
-		id,
 		addr,
 		name,
 		username,
 		password,
 		userid
 	)
-	VALUES ($1, $2, $3, $4, $5, $6)
+	VALUES ($1, $2, $3, $4, $5)
+	RETURNING id
 `
 
 
@@ -76,16 +76,15 @@ func (r *PostgresUserServersRepository) Create(
 	userServer *domain.UserServer,
 ) error {
 	
-	_, err := r.DB.ExecContext(
+	err := r.DB.QueryRowContext(
 		ctx,
 		CreateUserServer,
-		userServer.ID,
 		userServer.Addr,
 		userServer.Name,
 		userServer.UserName,
 		userServer.Password,
 		userServer.UserId,
-	)
+	).Scan(&userServer.ID)
 
 	return err
 }
