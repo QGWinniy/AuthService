@@ -46,7 +46,7 @@ func (r *PostgresUserServersRepository) CheckUserHasServer(
 	err := r.DB.QueryRowContext(
 		ctx,
 		CheckUserHasServer,
-		userServer.ID,
+		userServer.UserId,
 		userServer.Addr,
 	).Scan(&exists)
 
