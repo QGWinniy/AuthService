@@ -2,12 +2,12 @@ FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY server-service/go.mod server-service/go.sum ./
+RUN go mod download -x
 
-COPY . .
+COPY server-service/ ./
 
-RUN go build -o /tmp/server-service ./server-service/cmd
+RUN go build -o /tmp/server-service ./cmd
 
 FROM alpine:3.22
 

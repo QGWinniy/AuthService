@@ -46,17 +46,22 @@ func main() {
 	getUserServersUC := usecase.NewGetUserServersUC(
 		usecase.GetUserServersConfig{Repository: userServersRepo},
 	)
+	getUserServerUC := usecase.NewGetUserServerUC(
+		usecase.GetUserServerConfig{Repository: userServersRepo},
+	)
 
 	managerJWT := jwt.NewManager([]byte(os.Getenv("JWT_SECRET")))
 
 	handler := httpserver.NewSeverHandler(httpserver.Config{
 		CreationRequestedUC: creationRequestedUC,
 		GetUserServersUC:    getUserServersUC,
+		GetUserServerUC:     getUserServerUC,
 	})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /servers", middleware.AuthJWTMiddleware(handler.AddServer, managerJWT))
 	mux.HandleFunc("GET /servers", middleware.AuthJWTMiddleware(handler.GetUserServers, managerJWT))
+	mux.HandleFunc("GET /server", middleware.AuthJWTMiddleware(handler.GetUserServer, managerJWT))
 
 	server := &http.Server{
 		Addr:    ":8088",
@@ -66,7 +71,7 @@ func main() {
 	shutdownSignal := make(chan os.Signal, 1)
 	signal.Notify(shutdownSignal, os.Interrupt, syscall.SIGTERM)
 
-	log.Println("server-service_v7 started on :8088")
+	log.Println("server-service_v8 started on :8088")
 
 	go func() {
 		log.Printf("server-service is listening on %s", server.Addr)

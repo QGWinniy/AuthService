@@ -11,11 +11,7 @@ import (
 type Config struct {
 	CreationRequestedUC *usecase.ServerCreationRequestedUC
 	GetUserServersUC    *usecase.GetUserServersUC
-	// RegisterUC *usecase_users.RegisterUC
-	// LoginUC *usecase_users.LoginUC
-
-	// CreateSessionUC *usecase_sessions.CreateSessionUC
-	// GetSession *usecase_sessions.GetSessionUC
+	GetUserServerUC    *usecase.GetUserServerUC
 }
 
 type ServerHandler struct {
@@ -116,4 +112,39 @@ func (h *ServerHandler) GetUserServers(
 	w.WriteHeader(http.StatusOK)
 
 	_ = json.NewEncoder(w).Encode(response)
+}
+
+func (h *ServerHandler) GetUserServer(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	ctx := r.Context()
+	userIDUint, ok := ctx.Value(domain.UserIDKeyContext).(uint64)
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var request struct {
+		UserServerID int `json:"user_server_id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	userServer, err := h.config.GetUserServerUC.GetUserServer(
+		ctx,
+		int(userIDUint),
+		request.UserServerID,
+	)
+	if err != nil {
+		log.Printf("get user server error: %v", err)
+		http.Error(w, "user server not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(userServer)
 }

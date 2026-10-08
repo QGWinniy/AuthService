@@ -93,19 +93,21 @@ const GetUserServer = `
 		password,
 		userid
 	FROM user_servers
-	WHERE id = $1
+	WHERE userid = $1 AND id = $2
 `
 
 func (r *PostgresUserServersRepository) GetUserServer(
 	ctx context.Context,
-	id int,
+	userID int,
+	serverID int,
 ) (*domain.UserServer, error) {
 	userServer := &domain.UserServer{}
 
 	err := r.DB.QueryRowContext(
 		ctx,
 		GetUserServer,
-		id,
+		userID,
+		serverID,
 	).Scan(
 		&userServer.ID,
 		&userServer.Addr,
