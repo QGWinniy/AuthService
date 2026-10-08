@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>SSH Connect</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #111;
+            color: #fff;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 350px;
+            padding: 30px;
+
+            background: #1c1c1c;
+            border-radius: 10px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+
+            background: #111;
+            border: 1px solid #444;
+            border-radius: 5px;
+
+            color: white;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+
+            border: 0;
+            border-radius: 5px;
+
+            background: #444;
+            color: white;
+
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>SSH Terminal</h1>
+
+    <form id="connectForm">
+
+        <input
+            id="userID"
+            type="number"
+            placeholder="User ID"
+            required
+        >
+
+        <input
+            id="serverID"
+            type="number"
+            placeholder="Server ID"
+            required
+        >
+
+        <button type="submit">
+            Подключиться
+        </button>
+
+    </form>
+
+</div>
+
+<script src="/static/index.js"></script>
+
+</body>
+</html>
