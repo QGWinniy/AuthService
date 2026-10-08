@@ -1,3 +1,5 @@
 *.vscode
 *.env
 cookies.txt
+*.agents
+*.codex

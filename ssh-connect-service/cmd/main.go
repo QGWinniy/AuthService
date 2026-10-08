@@ -53,7 +53,7 @@ func main() {
 
 	jwt := jwtmanager.NewManager(userJWTSecret)
 	mux := stdhttp.NewServeMux()
-	mux.HandleFunc("POST /connect", middleware.AuthJWTMiddleware(handler.Connect, jwt))
+	mux.HandleFunc("GET /connect", middleware.AuthJWTMiddleware(handler.Connect, jwt))
 
 	port := os.Getenv("SSH_CONNECT_SERVICE_PORT")
 	if port == "" {

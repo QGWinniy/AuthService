@@ -2,12 +2,12 @@ FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY ssh-connect-service/go.mod ssh-connect-service/go.sum ./
 RUN go mod download -x
 
-COPY . .
+COPY ssh-connect-service/ ./
 
-RUN go build -o /tmp/ssh-connect-service ./ssh-connect-service/cmd
+RUN go build -o /tmp/ssh-connect-service ./cmd
 
 FROM alpine:3.22
 

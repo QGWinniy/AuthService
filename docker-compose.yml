@@ -439,6 +439,35 @@ services:
 
     restart: unless-stopped
 
+  # =========================
+  # SSH Connect Service
+  # =========================
+
+  ssh-connect-service:
+    build:
+      context: .
+      dockerfile: ssh-connect-service/Dockerfile
+
+    container_name: ssh-connect-service
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SSH_CONSOLE_JWT_SECRET: ${SSH_CONSOLE_JWT_SECRET}
+      SSH_CONSOLE_ENCRYPTION_KEY: ${SSH_CONSOLE_ENCRYPTION_KEY}
+      SERVER_SERVICE_URL: ${SERVER_SERVICE_URL}
+      SSH_CONNECT_SERVICE_PORT: 8090
+
+    depends_on:
+      - server-service
+
+    ports:
+      - "${SSH_CONNECT_SERVICE_PORT}:8090"
+
+    networks:
+      - backend
+
+    restart: unless-stopped
+
 
 # =========================
 # Network
